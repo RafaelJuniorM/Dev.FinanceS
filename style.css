@@ -1,3 +1,88 @@
-h1 {
-  border: 1px solid red;
+/* Global ====================== */
+:root {
+  --color-dark-blue: #363f5f; 
+  --color-white: #fff;
 }
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f0f2f5;
+  font-family: 'Poppins', sans-serif;
+}
+
+.container {
+  width: min(90vw, 800px); /* procura o menor valor entre os dois*/
+  margin: auto;
+}
+
+/* title ====================== */
+h2 {
+  margin-top: 3.2rem;
+  margin-bottom: 0.8rem;
+  color: var( --color-dark-blue);
+
+  font-weight: normal; /* 400*/
+}
+
+
+/* Header ====================== */
+header {
+  background: #2d4a22;
+  padding: 2rem 0 15rem;
+  text-align: center;
+}
+
+#logo {
+  color: var(--color-white);
+  font-weight: 100;
+}
+
+/* Balance ====================== */
+#balance {
+  margin-top: -7rem;
+}
+
+#balance h2 {
+  color: var(--color-white);
+  margin-top: 0%;
+}
+
+/* Cards ====================== */
+.card {
+  background: var(--color-white);
+  padding: 1.5rem 2rem;
+  border-radius: 0.25rem;
+
+  margin-bottom: 2rem;
+
+  color: var(--color-dark-blue);
+}
+
+.card h3 {
+  font-weight: normal;
+  font-size: 1rem;
+}
+
+.card p {
+  font-size: 2rem;
+  line-height: 3rem;
+
+  margin-top: 1rem;
+}
+
+.card.total {
+  background: #49aa26;
+  color: var(--color-white);
+}
+
+/* footer ====================== */
+footer {
+  text-align: center;
+}
+
+/* tabela ====================== */
