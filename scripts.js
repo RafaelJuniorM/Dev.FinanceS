@@ -16,34 +16,18 @@ const Modal = {
   }
 }
 
+const Storage = {
+  get(){
+    return JSON.parse(localStorage.getItem("dev.finances:transactions")) || []
+  },
+
+  set(transactions){
+    localStorage.setItem("dev.finances:transactions", JSON.stringify(transactions))
+  }
+}
+
 const Transaction = { // calcula 
-  all: [
-    {
-      
-      description: 'luz',
-      amount: -50000,
-      date: '23/01/2021'
-    },
-    {
-      
-      description: 'website',
-      amount: 500000,
-      date: '23/01/2021'
-    },
-    {
-      
-      description: 'Internet',
-      amount: -20000,
-      date: '23/01/2021'
-    },
-    {
-      description: 'App',
-      amount: 200000,
-      date: '23/01/2021'
-  
-  
-    }
-  ],
+  all: Storage.get(),
   
   add(transaction){ // add novas transaçoes no formulario
     Transaction.all.push(transaction)
@@ -100,22 +84,23 @@ const DOM = {
 
   addTransaction(transaction, index) {
     const tr = document.createElement('tr')
-    tr.innerHTML = DOM.innerHTMLTransaction(transaction)
+    tr.innerHTML = DOM.innerHTMLTransaction(transaction,index)
+    tr.dataset.index = index
 
     DOM.transactionsContainer.appendChild(tr)
   },
 
-  innerHTMLTransaction(transactionsin){
-    const CCSclass = transactionsin.amount > 0 ? "income" : "expense"
+  innerHTMLTransaction(transaction, index){
+    const CCSclass = transaction.amount > 0 ? "income" : "expense"
 
-    const amount = Utils.formatCurrency(transactionsin.amount)
+    const amount = Utils.formatCurrency(transaction.amount)
 
     const html =`  
-      <td class="description">${transactionsin.description}</td> <!-- coluna do body -->
+      <td class="description">${transaction.description}</td> <!-- coluna do body -->
       <td class="${CCSclass}">${amount}</td>
-      <td class="date"> ${transactionsin.date}</td>
+      <td class="date"> ${transaction.date}</td>
       <td>
-        <img src="./assets/minus.svg" alt="Excluir Transação">
+        <img onclick=" Transaction.remove(${index})" src="./assets/minus.svg" alt="Excluir Transação">
       </td>
     `
     return html
@@ -141,6 +126,18 @@ const DOM = {
 }
 
 const Utils = {
+  formatAmount(value){
+    value = Number(value) * 100 // retira o ponto quando a pessoa entra com valor no form
+    
+    return value
+  },
+
+  formatDate(date){
+    const splittedDate = date.split("-")
+
+    return `${splittedDate[2]}/${splittedDate[1]}/${splittedDate[0]}`
+  },
+
   formatCurrency(value) {
     const signal = Number(value) < 0 ? "-" : ""
 
@@ -162,7 +159,7 @@ const Form = {
   amount: document.querySelector('input#amount'),
   date: document.querySelector('input#date'),
 
-  getValues(){
+  getValues(){ // pega somente os valores do form
     return {
       description: Form.description.value,
       amount: Form.amount.value,
@@ -170,8 +167,19 @@ const Form = {
     }
   },
 
-  formatData(){
+  formatValues(){ // formantando os valores entrados no form
+    let {description, amount, date} = Form.getValues() 
 
+    amount = Utils.formatAmount(amount)
+
+    date = Utils.formatDate(date)
+
+    return {
+      description, // quando o nome da chave = variavel nao precisa colocar o :
+      amount,
+      date
+
+    }
   },
 
   validateFields(){
@@ -182,6 +190,16 @@ const Form = {
     }
   },
 
+  saveTransaction(transaction){
+    Transaction.add(transaction)
+  },
+
+  clearFields(){
+    Form.description.value = ""
+    Form.amount.value = ""
+    Form.date.value = ""
+  },
+
   submit(event){
     event.preventDefault()
 
@@ -190,26 +208,32 @@ const Form = {
        // Verificar se todas as informações foram preenchidas
       Form.validateFields()
       // formatar os dados para salvar 
-    
+      const transaction = Form.formatValues()
       // salvar
+      Form.saveTransaction(transaction)
       // apagar os dados do formulario
+      Form.clearFields()
       // modal feche (+ aparecer uma mensagem dizendo que deu certo )
+      Modal.close()
       // atualizar a aplicação 
-
+      
     } catch(error){
       alert(error.message)
     }
   }
 }
 
+
 const App = {
   init(){
     // faz a applicaçao iniciar
-    Transaction.all.forEach(transaction => { //
-      DOM.addTransaction(transaction)
+    Transaction.all.forEach((transaction, index) => { //
+      DOM.addTransaction(transaction, index)
     })
 
     DOM.updateBalance()
+
+    Storage.set(Transaction.all)
 
   },
   
